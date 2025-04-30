@@ -1,5 +1,8 @@
+from typing import Optional, List, Dict
+
+
 class HTMLNode:
-    def __init__(self, tag = None, value= None, children = None, props = None):
+    def __init__(self, tag:Optional[str] = None, value: Optional[str]= None, children:Optional[List['HTMLNode']]= None, props: Optional[Dict[str, str]] = None):
         self.tag = tag
         self.value = value
         if children is  None:
@@ -27,7 +30,7 @@ class HTMLNode:
 
 
 class ParentNode(HTMLNode):
-    def __init__(self, tag, children, props = None):
+    def __init__(self, tag: Optional[str], children: Optional[List['HTMLNode']], props: Optional[Dict[str,str]] = None):
         super().__init__(tag=tag, children=children, props=props)
 
     def to_html(self):
@@ -50,10 +53,10 @@ class ParentNode(HTMLNode):
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag, value, props=None):
+    def __init__(self, tag: Optional[str], value: Optional[str], props: Optional[Dict[str,str]]=None):
         super().__init__(tag, value, children=None, props=props)
 
-    def to_html(self):
+    def to_html(self)-> str:
         if self.value is None:
             raise ValueError("LeafNode must have a value")
 
