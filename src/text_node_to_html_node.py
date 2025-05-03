@@ -1,5 +1,7 @@
-from textnode import TextNode, TextType
-from htmlnode import LeafNode
+from src.htmlnode import LeafNode
+from src.textnode import TextNode, TextType
+
+
 # from typing import Dict,Callable
 
 # Nice and clean solution with `match` - but available from python v3.10

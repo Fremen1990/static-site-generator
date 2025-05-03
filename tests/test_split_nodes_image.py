@@ -30,7 +30,7 @@ class TestSplitNodesImage(unittest.TestCase):
         node = TextNode("This is test with a single ![image](https://example.com/image.png)", TextType.TEXT)
         nodes_after_splitting = split_nodes_image([node])
         self.assertListEqual([
-            TextNode("This is test with a single", TextType.TEXT),
+            TextNode("This is test with a single ", TextType.TEXT),
             TextNode("image", TextType.IMAGE, "https://example.com/image.png")
         ], nodes_after_splitting)
 
