@@ -1,14 +1,11 @@
+import re
 from typing import List
 
 def markdown_to_blocks(markdown: str)-> List[str]:
-    result = []
+    normalized_markdown = markdown.replace('\r\n', '\n').replace('\r', '\n')
 
-    blocks = markdown.split("\n\n")
+    blocks = re.split(r'\n\s*\n+', normalized_markdown)
 
-    for block in blocks:
-        stripped_block = block.strip()
-
-        if stripped_block != "":
-            result.append(stripped_block)
+    result = [block.strip() for block in blocks if block.strip()]
 
     return result
