@@ -1,34 +1,43 @@
 import os.path
 import shutil
 
-from textnode import TextNode, TextType
+SOURCE = "static"
+DESTINATION = "public"
 
+def generate_public(source=SOURCE, destination=DESTINATION):
+    if not os.path.exists(source):
+        raise Exception("No source 'static' directory")
 
-def copy_static_to_public()-> None:
-    if os.path.exists("static") == False:
-        print("No static directory")
-        return Exception("No 'static' directory")
+    if os.path.exists(destination):
+        shutil.rmtree(destination)
 
+    if not os.path.exists(destination):
+        os.mkdir(destination)
 
-
-    if os.path.exists("public") == True:
-        shutil.rmtree('public')
-
-    if os.path.exists("public") == False:
-        os.mkdir("public")
-
-
-    shutil.copy("static/index.css", "public")
-    os.mkdir("public/images")
-    shutil.copy("static/images/tolkien.png", "public/images/tolkien.png")
+    copy_static_to_public(source, destination)
+    files_after_coping = os.listdir(destination)
+    print(f"\n Files and directories created in destination {destination}: \n {files_after_coping} \n")
     return None
 
 
-def main()-> None:
-    # node = TextNode("This is some anchor text", TextType.LINK, "https://www.boot.dev")
-    # print(node)
+def copy_static_to_public(source:str, destination:str):
+    for item in os.listdir(source):
+        src_path = os.path.join(source, item)
+        dst_path = os.path.join(destination, item)
 
-    copy_static_to_public()
+        is_file =     os.path.isfile(src_path)
+
+        if not is_file:
+            os.makedirs(dst_path, exist_ok=True)
+            copy_static_to_public(src_path, dst_path)
+
+        if is_file:
+            shutil.copy(src_path, dst_path)
+            print(f"File: {item}, has been copied from {source} to {destination}")
+
+
+def main()-> None:
+    generate_public()
 
 if __name__ == "__main__":
     main()
