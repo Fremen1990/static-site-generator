@@ -1,11 +1,27 @@
+from typing import List, Callable, Dict, Optional
 from src.block_to_block_type import block_to_block_type, BlockType
 from src.htmlnode import HTMLNode, ParentNode, LeafNode
 from src.markdown_to_blocks import markdown_to_blocks
 from src.text_to_textnodes import text_to_textnodes
 from src.text_node_to_html_node import text_node_to_html_node
 
+# TODO: separate this to constants.py and reuse in all places in the app where we use these strings
+# Constants for markdown syntax elements
+HEADING_MARKER = '#'
+CODE_FENCE = '```'
+QUOTE_MARKER = '>'
+UNORDERED_LIST_MARKER = '-'
+NEWLINE = '\n'
+SPACE = ' '
 
-def text_to_children(text: str) -> list[HTMLNode]:
+
+def markdown_to_html_node(markdown: str) -> HTMLNode:
+    blocks = markdown_to_blocks(markdown)
+    html_nodes = [block_to_html_node(block) for block in blocks]
+    return ParentNode("div", html_nodes)
+
+
+def text_to_children(text: str) -> List[HTMLNode]:
     text_nodes = text_to_textnodes(text)
     return [text_node_to_html_node(node) for node in text_nodes]
 
@@ -13,83 +29,119 @@ def text_to_children(text: str) -> list[HTMLNode]:
 def block_to_html_node(block: str) -> HTMLNode:
     block_type = block_to_block_type(block)
 
-    if block_type == BlockType.PARAGRAPH:
-        paragraph_text = ' '.join([line.strip() for line in block.split('\n')])
-        return ParentNode("p", text_to_children(paragraph_text))
+    # Dictionary mapping block types to their handler functions
+    block_handlers: Dict[BlockType, Callable[[str], HTMLNode]] = {
+        BlockType.PARAGRAPH: _handle_paragraph_block,
+        BlockType.HEADING: _handle_heading_block,
+        BlockType.CODE: _handle_code_block,
+        BlockType.QUOTE: _handle_quote_block,
+        BlockType.UNORDERED_LIST: _handle_unordered_list_block,
+        BlockType.ORDERED_LIST: _handle_ordered_list_block
+    }
 
-    elif block_type == BlockType.HEADING:
-        # Extract heading level (number of #)
-        level = 0
-        for char in block:
-            if char == '#':
-                level += 1
-            else:
-                break
+    handler = block_handlers.get(block_type)
+    if handler:
+        return handler(block)
 
-        # Get the heading text (removing the # prefix)
-        heading_text = block[level:].strip()
-
-        return ParentNode(f"h{level}", text_to_children(heading_text))
-
-    elif block_type == BlockType.CODE:
-        # Remove the ``` from start and end
-        lines = block.split('\n')
-        # Only keep content between the triple backticks and ensure proper newlines
-        code_lines = lines[1:-1] if len(lines) > 2 else []
-        # Make sure we preserve the newlines at the end of each line
-        # Add an extra newline at the end to match the expected output
-        code_content = '\n'.join(code_lines) + '\n'
-
-        # Code blocks should not process inline markdown
-        code_node = LeafNode("code", code_content)
-        return ParentNode("pre", [code_node])
-
-    elif block_type == BlockType.QUOTE:
-        # Remove the > prefix from each line and join with space
-        quote_lines = []
-        for line in block.split('\n'):
-            if line.strip():
-                # Remove the '>' prefix and any leading space after it
-                line_content = line.lstrip('>').lstrip()
-                quote_lines.append(line_content)
-
-        quote_content = ' '.join(quote_lines)
-        return ParentNode("blockquote", text_to_children(quote_content))
-
-    elif block_type == BlockType.UNORDERED_LIST:
-        # Split into list items and remove the - prefix
-        items = block.split('\n')
-        list_items = []
-
-        for item in items:
-            if item.strip():
-                item_text = item[2:].strip()  # Remove "- " prefix
-                list_items.append(ParentNode("li", text_to_children(item_text)))
-
-        return ParentNode("ul", list_items)
-
-    elif block_type == BlockType.ORDERED_LIST:
-        # Split into list items and remove the number prefix
-        items = block.split('\n')
-        list_items = []
-
-        for item in items:
-            if item.strip():
-                # Find the position after the digit and dot
-                parts = item.split('. ', 1)
-                if len(parts) > 1:
-                    item_text = parts[1].strip()
-                    list_items.append(ParentNode("li", text_to_children(item_text)))
-
-        return ParentNode("ol", list_items)
-
-    # Default case (should not happen with proper block typing)
     return ParentNode("div", text_to_children(block))
 
 
-def markdown_to_html_node(markdown: str) -> HTMLNode:
-    blocks = markdown_to_blocks(markdown)
+def _normalize_text_lines(block: str) -> str:
+    lines = [line.strip() for line in block.split(NEWLINE)]
+    return SPACE.join(line for line in lines if line)
 
-    html_nodes = [block_to_html_node(block) for block in blocks]
 
-    return ParentNode("div", html_nodes)
+def _handle_paragraph_block(block: str) -> HTMLNode:
+    paragraph_text = _normalize_text_lines(block)
+    return ParentNode("p", text_to_children(paragraph_text))
+
+
+def _count_leading_characters(text: str, char: str) -> int:
+    count = 0
+    for c in text:
+        if c == char:
+            count += 1
+        else:
+            break
+    return count
+
+
+def _handle_heading_block(block: str) -> HTMLNode:
+    level = _count_leading_characters(block, HEADING_MARKER)
+    heading_text = block[level:].strip()
+    return ParentNode(f"h{level}", text_to_children(heading_text))
+
+
+def _extract_content_between_fences(block: str) -> str:
+    lines = block.split(NEWLINE)
+
+    # Skip first and last lines (the fences)
+    content_lines = lines[1:-1] if len(lines) > 2 else []
+
+    # Add trailing newline to match expected output
+    return NEWLINE.join(content_lines) + NEWLINE
+
+
+def _handle_code_block(block: str) -> HTMLNode:
+    code_content = _extract_content_between_fences(block)
+    code_node = LeafNode("code", code_content)
+    return ParentNode("pre", [code_node])
+
+
+def _remove_prefix_from_line(line: str, prefix: str) -> str:
+    return line.lstrip(prefix).lstrip()
+
+
+def _extract_quote_lines(block: str) -> List[str]:
+    quote_lines = []
+    for line in block.split(NEWLINE):
+        if line.strip():
+            line_content = _remove_prefix_from_line(line, QUOTE_MARKER)
+            quote_lines.append(line_content)
+    return quote_lines
+
+
+def _handle_quote_block(block: str) -> HTMLNode:
+    quote_lines = _extract_quote_lines(block)
+    quote_content = SPACE.join(quote_lines)
+    return ParentNode("blockquote", text_to_children(quote_content))
+
+
+def _create_list_item(item_text: str) -> HTMLNode:
+    return ParentNode("li", text_to_children(item_text))
+
+
+def _extract_list_items(block: str, process_line: Callable[[str], Optional[str]]) -> List[HTMLNode]:
+    list_items = []
+
+    for line in block.split(NEWLINE):
+        if not line.strip():
+            continue
+
+        item_text = process_line(line)
+        if item_text:
+            list_items.append(_create_list_item(item_text))
+
+    return list_items
+
+
+def _process_unordered_list_item(line: str) -> str:
+    return _remove_prefix_from_line(line, UNORDERED_LIST_MARKER)
+
+
+def _handle_unordered_list_block(block: str) -> HTMLNode:
+    list_items = _extract_list_items(block, _process_unordered_list_item)
+    return ParentNode("ul", list_items)
+
+
+def _process_ordered_list_item(line: str) -> Optional[str]:
+    # Find the first dot after a number
+    dot_pos = line.find('.')
+    if dot_pos > 0 and line[:dot_pos].strip().isdigit():
+        return line[dot_pos + 1:].lstrip()
+    return None
+
+
+def _handle_ordered_list_block(block: str) -> HTMLNode:
+    list_items = _extract_list_items(block, _process_ordered_list_item)
+    return ParentNode("ol", list_items)
