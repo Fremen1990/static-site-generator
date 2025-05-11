@@ -1,9 +1,9 @@
 from typing import List, Callable, Dict, Optional
-from src.block_to_block_type import block_to_block_type, BlockType
-from src.htmlnode import HTMLNode, ParentNode, LeafNode
-from src.markdown_to_blocks import markdown_to_blocks
-from src.text_to_textnodes import text_to_textnodes
-from src.text_node_to_html_node import text_node_to_html_node
+from block_to_block_type import block_to_block_type, BlockType
+from htmlnode import HTMLNode, ParentNode, LeafNode
+from markdown_to_blocks import markdown_to_blocks
+from text_to_textnodes import text_to_textnodes
+from text_node_to_html_node import text_node_to_html_node
 
 # TODO: separate this to constants.py and reuse in all places in the app where we use these strings
 # Constants for markdown syntax elements

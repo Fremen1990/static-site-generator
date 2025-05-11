@@ -1,8 +1,15 @@
 import os.path
 import shutil
 
+from generate_page import generate_page
+
 SOURCE = "static"
 DESTINATION = "public"
+
+FROM_PATH = "content/index.md"
+TEMPLATE_PATH = "template.html"
+DEST_PATH = os.path.join(DESTINATION, "index.html")
+
 
 def generate_public(source=SOURCE, destination=DESTINATION):
     if not os.path.exists(source):
@@ -38,6 +45,7 @@ def copy_static_to_public(source:str, destination:str):
 
 def main()-> None:
     generate_public()
+    generate_page(FROM_PATH, TEMPLATE_PATH, DEST_PATH )
 
 if __name__ == "__main__":
     main()

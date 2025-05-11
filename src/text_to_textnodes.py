@@ -1,8 +1,8 @@
 from typing import List
 
-from src.splitters.splitters import split_nodes_bold, split_nodes_italic, split_nodes_image, split_nodes_code, \
+from splitters.splitters import split_nodes_bold, split_nodes_italic, split_nodes_image, split_nodes_code, \
     split_nodes_link
-from src.textnode import TextNode, TextType
+from textnode import TextNode, TextType
 
 
 def text_to_textnodes(text: str) -> List[TextNode]:

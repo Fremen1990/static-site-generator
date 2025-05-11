@@ -1,6 +1,6 @@
 from typing import List
 
-from src.textnode import TextNode, TextType
+from textnode import TextNode, TextType
 
 
 def split_nodes_delimiter(old_nodes: List[TextNode], delimiter:str, text_type: TextType)-> List[TextNode]:

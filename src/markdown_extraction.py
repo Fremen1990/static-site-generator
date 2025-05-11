@@ -1,7 +1,7 @@
 import re
 from typing import Tuple, List
 
-from src.patterns import MARKDOWN_IMAGE_PATTERN, MARKDOWN_LINK_PATTERN
+from patterns import MARKDOWN_IMAGE_PATTERN, MARKDOWN_LINK_PATTERN
 
 
 def extract_markdown_images(text:str)-> List[Tuple[str,str]]:
