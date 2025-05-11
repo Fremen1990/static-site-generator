@@ -1,5 +1,5 @@
-from htmlnode import LeafNode
-from textnode import TextNode, TextType
+from src.htmlnode import LeafNode
+from src.textnode import TextNode, TextType
 
 
 # from typing import Dict,Callable

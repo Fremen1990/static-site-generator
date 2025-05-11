@@ -1,7 +1,7 @@
 import os.path
 import shutil
 
-from generate_page import generate_page
+from src.generate_page import generate_page
 
 SOURCE = "static"
 DESTINATION = "public"

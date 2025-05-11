@@ -1,9 +1,9 @@
 from typing import List
 
-from markdown_extraction import extract_markdown_images, extract_markdown_links
-from splitters.markdown_splitting import split_nodes_by_markdown
-from splitters.split_nodes_delimiter import split_nodes_delimiter
-from textnode import TextNode, TextType
+from src.markdown_extraction import extract_markdown_images, extract_markdown_links
+from src.splitters.markdown_splitting import split_nodes_by_markdown
+from src.splitters.split_nodes_delimiter import split_nodes_delimiter
+from src.textnode import TextNode, TextType
 
 
 def split_nodes_bold(old_nodes: List[TextNode]) -> List[TextNode]:

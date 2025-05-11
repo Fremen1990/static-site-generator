@@ -1,6 +1,5 @@
 import unittest
 
-from src.splitters.splitters import split_nodes_image
 
 
 class TestSplitNodesImage(unittest.TestCase):
@@ -77,7 +76,7 @@ class TestSplitNodesImage(unittest.TestCase):
 
 import unittest
 
-from src.splitters.splitters import split_nodes_link
+from src.splitters.splitters import split_nodes_link, split_nodes_image
 from src.textnode import TextNode, TextType
 
 # @unittest.skip("Skipping TestSplitNodesLink for now")
