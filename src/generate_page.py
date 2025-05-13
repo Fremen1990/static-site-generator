@@ -4,7 +4,7 @@ from src.extract_title import extract_title
 from src.markdown_to_html_node import markdown_to_html_node
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path, "r", encoding="utf-8") as f:
@@ -19,6 +19,12 @@ def generate_page(from_path, template_path, dest_path):
 
     template_file_with_new_title = template_file.replace("{{ Title }}", title)
     template_file_with_new_content = template_file_with_new_title.replace("{{ Content }}", html_string)
+
+    # Replace href="/" with href="{basepath}"
+    template_file_with_new_content = template_file_with_new_content.replace('href="/', f'href="{basepath}')
+
+    # Replace src="/" with src="{basepath}"
+    template_file_with_new_content = template_file_with_new_content.replace('src="/', f'src="{basepath}')
 
     dir_name = os.path.dirname(dest_path)
     if dir_name:
