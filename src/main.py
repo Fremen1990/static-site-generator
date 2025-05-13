@@ -51,7 +51,7 @@ def main()-> None:
         basepath = sys.argv[1]
 
     generate_public()
-    generate_pages_recursive(FROM_PATH, TEMPLATE_PATH, DEST_PATH, basepath)
+    generate_pages_recursive(FROM_PATH, TEMPLATE_PATH, DEST_PATH, basepath=basepath)
 
 if __name__ == "__main__":
     main()

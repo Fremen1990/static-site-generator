@@ -20,10 +20,10 @@ def generate_page(from_path, template_path, dest_path, basepath):
     template_file_with_new_title = template_file.replace("{{ Title }}", title)
     template_file_with_new_content = template_file_with_new_title.replace("{{ Content }}", html_string)
 
-    # Replace href="/" with href="{basepath}"
+    # Replace all href="/x" with href="{basepath}x"
     template_file_with_new_content = template_file_with_new_content.replace('href="/', f'href="{basepath}')
 
-    # Replace src="/" with src="{basepath}"
+    # Replace all src="/x" with src="{basepath}x"
     template_file_with_new_content = template_file_with_new_content.replace('src="/', f'src="{basepath}')
 
     dir_name = os.path.dirname(dest_path)
