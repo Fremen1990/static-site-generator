@@ -3,7 +3,7 @@ import os
 from src.generate_page import generate_page
 
 
-def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, basepath:str)-> None:
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, basepath:str = "/")-> None:
     entries = os.listdir(dir_path_content)
 
     for entry in entries:
@@ -22,6 +22,6 @@ def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir
             # Ensure the corresponding directory exists in destination
             os.makedirs(os.path.join(dest_dir_path, relative_path), exist_ok=True)
             # Recursively process the subdirectory
-            generate_pages_recursive(entry_path, template_path, os.path.join(dest_dir_path, relative_path), basepath)
+            generate_pages_recursive(entry_path, template_path, os.path.join(dest_dir_path, relative_path), basepath="/")
 
 
